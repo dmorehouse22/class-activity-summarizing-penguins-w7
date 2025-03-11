@@ -1,6 +1,6 @@
 ---
 title: "Summarizing Penguins"
-author: "Your Name (and Parner)"
+author: "Danny Morehouse"
 format: gfm
 execute: 
   echo: true
@@ -41,7 +41,9 @@ data(penguins)
 Use `mutate()` to add a new column, while keeping the existing columns. The general structure is:
 
 ```{r}
+#| label: add-new-column
 #| eval: false
+
 df |>
   mutate(new_column_name = what_it_contains)
 ```
@@ -49,6 +51,7 @@ df |>
 For example, if I had a data frame df with columns A and B, I can add a new column C that is the sum of A and B as follows (note: you can also use sum(A,B) here instead of A + B):
 
 ```{r}
+#| label: sum-a-b
 #| eval: false
 df |>
   mutate(C = A + B)
@@ -79,35 +82,60 @@ penguins |>
 Create new variable called `bill_ratio` that is the ratio of length to depth (length/depth)
 
 ```{r}
+#| label: create-bill-ratio
+# Used mutate() to create a new variable
 
+penguins |>
+  mutate(bill_ratio = bill_length_mm/bill_depth_mm)
 ```
 
 
 Now create a boxplot of `bill_ratio` split by species.  Be sure to add labels to the axes.  You can add other modifications if you want as well (fill/color, theme, etc).
 
 ```{r}
+#| label: boxplot-bill-ratio
+# Created boxplot of new variable, chose to add theme_light() and orange because it's my favorite color
+# Wouldn't let me add bill_ratio, so I added the length/depth ratio
 
+ggplot(data = penguins) + 
+  geom_boxplot(mapping = aes(x = species, y = bill_length_mm/bill_depth_mm)) + 
+  labs(x = "Species of Penguin",
+       y = "Bill Ratio (length/depth, mm)",
+       title = "Bill Ratio Across Different Species of Penguin") +
+  theme_light()
 ```
 
 
 Add three new columns to penguins within one `mutate()` function: one column that contains the bill ratio (bill length / bill depth), one that contains the body mass converted to kg, and one that contains the flipper length converted to meters.
 
 ```{r}
+#| label: 3-new-columns
+# Made sure to search the proper conversions between units
+
 penguins |>
-  mutate(bill_ratio = ___________,
-         body_mass_kg = ___________,
-         flipper_length_m = ______________)
+  mutate(bill_ratio = bill_length_mm/bill_depth_mm,
+         body_mass_kg = body_mass_g / 1000,
+         flipper_length_m = flipper_length_mm / 1000)
 ```
 
 
 We can also use `mutate()` to modify an existing variable.  By default, R reports factors in alphabetical order (you may notice in your boxplot they always print in the same order, Adelie, Chinstrap, Gentoo). If we want to reorder, we can use a function `fct_relevel()` from the `forcats` package, which we will learn about in a few weeks. Modify the code below to calculate the `bill_ratio` and then recreate the boxplot from above by species - how does it differ? 
 
 ```{r}
+#| label: modify-existing-variable
+# Reordered species of penguins on the x-axis of the original boxplot
+
 penguins |> 
   mutate(species = 
            fct_relevel(species, "Adelie", "Gentoo", "Chinstrap"),
-         bill_ratio = ___________) |> 
-  ___________
+         bill_ratio = bill_length_mm/bill_depth_mm) |> 
+  ggplot(data = penguins) + 
+  geom_boxplot(mapping = aes(x = species, 
+                             y = bill_length_mm/bill_depth_mm)) + 
+  labs(x = "Species of Penguin",
+       y = "Bill Ratio (length/depth, mm)",
+       title = "Bill Ratio Across Different Species of Penguin (Reordered)") +
+  theme_light()
   
 ```
 
